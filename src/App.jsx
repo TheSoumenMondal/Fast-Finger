@@ -1,12 +1,24 @@
 import "./App.css";
+import { faker } from "@faker-js/faker";
 import { IoHome } from "react-icons/io5";
 import { FaGithub, FaHeart } from "react-icons/fa";
 import { AiOutlineFileText } from "react-icons/ai";
 import { IoIosGitBranch } from "react-icons/io";
 import { CiCalendarDate } from "react-icons/ci";
 import { GrPowerReset } from "react-icons/gr";
+import { useState } from "react";
+
+const RandomData = () => {
+  return faker.lorem.words(30);
+};
 
 function App() {
+  const [newTypingData, setNewTypingData] = useState(RandomData());
+
+  const handleReset = () => {
+    setNewTypingData(RandomData());
+  };
+
   return (
     <div className="w-full h-screen bg-[#121716]">
       {/* Message for mobile screens */}
@@ -32,30 +44,27 @@ function App() {
         <div className="flex items-center flex-col h-full w-full px-6">
           <div className="timer">
             <div className="title text-center text-[#808987]">Timer</div>
-
             <div className="text-7xl text-center text-[#44514e]">01</div>
           </div>
 
           <div className="mainContent flex justify-center items-center flex-col">
-            <div className="textContent text-xl flex justify-center items-start mb-16 px-28 mt-6 text-[#049669] tracking-widest h-28">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore
-              vero praesentium, pariatur architecto aperiam sapiente ipsa
-              facilis nobis ducimus reprehenderit enim doloremque quo reiciendis
-              quaerat neque temporibus? Eaque maxime alias sequi possimus sint.
-             
+            <div className="textContent text-2xl flex justify-center items-start mb-16 px-28 mt-6 text-[#049669] tracking-widest h-32">
+              {newTypingData}
             </div>
 
-            <button className="flex justify-center items-center text-sm gap-1 text-[#808987]">
+            <button
+              className="flex justify-center items-center text-sm gap-1 text-[#808987]"
+              onClick={handleReset} // Call handleReset on click
+            >
               <GrPowerReset className="text-[#dfd800] mr-2 text-xl" />
               Start Over
             </button>
           </div>
 
-        <div className=" w-full h-[80%] flex items-center justify-between px-80">
-          <span className="text-[#fefefe]">Speed</span>
-          <span className="text-[#fefefe]">Accuracy</span>
-        </div>
-
+          <div className="w-full h-[80%] flex items-center justify-between px-80">
+            <span className="text-[#fefefe]">Speed</span>
+            <span className="text-[#fefefe]">Accuracy</span>
+          </div>
         </div>
 
         {/* Footer Section */}
