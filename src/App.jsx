@@ -20,9 +20,9 @@ function App() {
   };
 
   return (
-    <div className="w-full h-screen bg-[#121716]">
+    <div className="w-full h-screen bg-[#121413]">
       {/* Message for mobile screens */}
-      <h1 className="block sm:hidden text-3xl text-[#059668] font-bold absolute mx-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center select-none">
+      <h1 className="block sm:hidden text-3xl text-[#059668] font-bold absolute mx-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-left select-none">
         Please Switch to a Desktop Screen 👽
       </h1>
 
@@ -48,7 +48,7 @@ function App() {
           </div>
 
           <div className="mainContent flex justify-center items-center flex-col">
-            <div className="textContent text-2xl flex justify-center items-start mb-16 px-28 mt-6 text-[#049669] tracking-widest h-32">
+            <div className="textContent text-2xl flex justify-center items-start mb-16 px-28 mt-6 text-[#009a6a] tracking-widest h-32">
               {newTypingData}
             </div>
 
@@ -75,7 +75,7 @@ function App() {
               <FaGithub className="text-[#ffffff] mr-2" />
               Created by:&nbsp;
               <a
-                href="https://github.com/TheSoumenMondal"
+                href="https://github.com/TheSoumenMondal/Fast-Finger"
                 className="text-[#059668] ml-1"
               >
                 Soumen&nbsp;
