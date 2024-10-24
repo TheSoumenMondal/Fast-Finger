@@ -1,0 +1,12 @@
+.correct{
+    color: green;
+}
+
+.active{
+    color: yellow;
+    text-decoration: underline;
+}
+
+.wrong{
+    color: red;
+}

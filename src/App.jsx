@@ -1,34 +1,109 @@
 import "./App.css";
-import { faker } from "@faker-js/faker";
+import "./styles/style.css";
 import { IoHome } from "react-icons/io5";
 import { FaGithub, FaHeart } from "react-icons/fa";
 import { AiOutlineFileText } from "react-icons/ai";
 import { IoIosGitBranch } from "react-icons/io";
 import { CiCalendarDate } from "react-icons/ci";
 import { GrPowerReset } from "react-icons/gr";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import data from "./utils/data";
 
-const RandomData = () => {
-  return faker.lorem.words(30);
-};
+const TypingData = data[Math.floor(Math.random() * data.length)].typing_data;
 
 function App() {
-  const [newTypingData, setNewTypingData] = useState(RandomData());
+  const maxTime = 60;
+  const [timeLeft, setTimeLeft] = useState(maxTime);
+  const [mistakes, setMistakes] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+  const [charIndex, setCharIndex] = useState(0);
+  const [WPM, setWPM] = useState(0);
+  const [CPM, setCPM] = useState(0);
+  const [correctWrong, setCorrectWrong] = useState([]);
+
+  const inputRef = useRef(null);
+  const charRef = useRef([]);
+
+  useEffect(() => {
+    inputRef.current.focus();
+    setCorrectWrong(Array(charRef.current.length).fill(""));
+  }, []);
+
+  useEffect(() => {
+    let interval;
+    if (isTyping && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+        let correctChar = charIndex - mistakes;
+        let totalTime = maxTime - timeLeft;
+
+        let cpm = correctChar * (60 / totalTime);
+        cpm = cpm < 0 || !cpm || cpm === Infinity ? 0 : cpm;
+        setCPM(parseInt(cpm, 10));
+
+        let wpm = Math.round((correctChar / 5) * (60 / totalTime));
+        wpm = wpm < 0 || !wpm || wpm === Infinity ? 0 : wpm;
+        setWPM(wpm);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      clearInterval(interval);
+      setIsTyping(false);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isTyping, timeLeft]);
+
+  const handleChange = (e) => {
+    const characters = charRef.current;
+    let currentChar = characters[charIndex];
+    let typedCharacter = e.target.value.slice(-1);
+
+    if (charIndex < characters.length && timeLeft > 0) {
+      if (!isTyping) {
+        setIsTyping(true);
+      }
+
+      const newCorrectWrong = [...correctWrong];
+
+      if (typedCharacter === currentChar.textContent) {
+        setCharIndex(charIndex + 1);
+        newCorrectWrong[charIndex] = "correct";
+      } else {
+        setCharIndex(charIndex + 1);
+        setMistakes(mistakes + 1);
+        newCorrectWrong[charIndex] = "wrong";
+      }
+
+      setCorrectWrong(newCorrectWrong);
+
+      if (charIndex === characters.length - 1) {
+        setIsTyping(false);
+      }
+    }
+  };
 
   const handleReset = () => {
-    setNewTypingData(RandomData());
+    setCharIndex(0);
+    setMistakes(0);
+    setTimeLeft(maxTime);
+    setWPM(0);
+    setCPM(0);
+    setCorrectWrong(Array(charRef.current.length).fill(""));
+    setIsTyping(false);
+    inputRef.current.focus();
   };
 
   return (
     <div className="w-full h-screen bg-[#121413]">
-      {/* Message for mobile screens */}
       <h1 className="block sm:hidden text-3xl text-[#059668] font-bold absolute mx-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-left select-none">
         Please Switch to a Desktop Screen 👽
       </h1>
 
       <div className="hidden sm:grid grid-rows-[15%_70%_15%] px-56 h-full">
+        {/* Header */}
         <div className="w-full h-full flex justify-between items-center">
-          <h1 className="logo text-[#fefefe] text-xl font-[400]">
+          <h1 className="logo text-[#fefefe] text-xl font-[400] select-none">
             Fast Finger
             <span className="text-[#059668] text-[10px] ml-1">
               Typing Speed
@@ -40,21 +115,38 @@ function App() {
           </span>
         </div>
 
-        {/* Main Content Section */}
         <div className="flex items-center flex-col h-full w-full px-6">
           <div className="timer">
             <div className="title text-center text-[#808987]">Timer</div>
-            <div className="text-7xl text-center text-[#44514e]">01</div>
+            <div className="text-7xl text-center text-[#44514e]">
+              <strong>{timeLeft}</strong>
+            </div>
           </div>
 
-          <div className="mainContent flex justify-center items-center flex-col">
-            <div className="textContent text-2xl flex justify-center items-start mb-16 px-28 mt-6 text-[#009a6a] tracking-widest h-32">
-              {newTypingData}
+          <div className="mainContent flex justify-center items-center flex-col w-full">
+            <input
+              type="text"
+              className="input-field absolute -z-50 opacity-0"
+              ref={inputRef}
+              onChange={handleChange}
+            />
+            <div className="textContent text-xl font-mono h-72 p-6 text-[#808987] tracking-wide">
+              {TypingData.split("").map((char, index) => (
+                <span
+                  key={index}
+                  className={`char ${index === charIndex ? "active" : ""} ${
+                    correctWrong[index]
+                  }`}
+                  ref={(e) => (charRef.current[index] = e)}
+                >
+                  {char}
+                </span>
+              ))}
             </div>
 
             <button
               className="flex justify-center items-center text-sm gap-1 text-[#808987]"
-              onClick={handleReset} // Call handleReset on click
+              onClick={handleReset}
             >
               <GrPowerReset className="text-[#dfd800] mr-2 text-xl" />
               Start Over
@@ -62,15 +154,14 @@ function App() {
           </div>
 
           <div className="w-full h-[80%] flex items-center justify-between px-80">
-            <span className="text-[#fefefe]">Speed</span>
-            <span className="text-[#fefefe]">Accuracy</span>
+            <span className="text-[#fefefe]">WPM : {WPM}</span>
+            <span className="text-[#fefefe]">Accuracy : {CPM}</span>
+            <span className="text-[#fefefe]">Mistakes : {mistakes}</span>
           </div>
         </div>
 
-        {/* Footer Section */}
         <div className="footer w-full flex justify-between items-center py-4 border-t border-[#2b3635]">
           <div className="flex space-x-8 items-center">
-            {/* Reduced size of text in footer */}
             <span className="text-xs text-gray-400 flex items-center">
               <FaGithub className="text-[#ffffff] mr-2" />
               Created by:&nbsp;
